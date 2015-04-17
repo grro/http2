@@ -51,7 +51,6 @@ public class HighLevelHttp2ClientTest {
         
         server = WebServer.servlet(new MyServlet())
                           .start();
-System.out.println(server.getBasepath());        
     }
 
     
