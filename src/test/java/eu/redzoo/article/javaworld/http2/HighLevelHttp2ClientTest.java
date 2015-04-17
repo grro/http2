@@ -26,21 +26,19 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.http2.client.HTTP2Client;
 import org.eclipse.jetty.http2.client.http.HttpClientTransportOverHTTP2;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 
 @SuppressWarnings("serial")
 public class HighLevelHttp2ClientTest {
 
-    private WebServer server;
     
-    
-    @Before
-    public void before() {
-
+    @Test
+    public void highLevelApiTest() throws Exception {
+        
+        
+        // start the test server
         class MyServlet extends HttpServlet { 
             
             @Override
@@ -49,34 +47,29 @@ public class HighLevelHttp2ClientTest {
             }
         };
         
-        server = WebServer.servlet(new MyServlet())
-                          .start();
-    }
-
-    
-    @After
-    public void after() {
-        server.stop();
-    }
-
-
-    
-    
-    @Test
-    public void highLevelApiTest() throws Exception {
+        WebServer server = WebServer.servlet(new MyServlet())
+                                    .start();
         
+        
+        
+        // create a low-level jetty HTTP/2 client
         HTTP2Client lowLevelClient = new HTTP2Client();
         lowLevelClient.start();
         
+        // create a high-level jetty HTTP/2 client
         HttpClient client = new HttpClient(new HttpClientTransportOverHTTP2(lowLevelClient), null);
         client.start();
 
+
+        // and perform the http transaction
         ContentResponse response = client.GET("http://localhost:" + server.getLocalport());
-        
         System.out.println(response.getVersion() + " " + response.getStatus() + " ");
         Assert.assertEquals("...my body data...", new String(response.getContent()));
 
 
+        
+        
+        // shut down the client and server
         client.stop();
         server.stop();
     }

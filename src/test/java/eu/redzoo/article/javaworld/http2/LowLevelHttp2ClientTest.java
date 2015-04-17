@@ -16,6 +16,7 @@
 package eu.redzoo.article.javaworld.http2;
 
 import java.io.IOException;
+
 import java.net.InetSocketAddress;
 
 import javax.servlet.ServletException;
@@ -34,20 +35,18 @@ import org.eclipse.jetty.http2.client.HTTP2Client;
 import org.eclipse.jetty.http2.frames.HeadersFrame;
 import org.eclipse.jetty.util.FuturePromise;
 import org.eclipse.jetty.util.Promise;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 
 @SuppressWarnings("serial")
 public class LowLevelHttp2ClientTest {
 
-    private WebServer server;
+
     
-    
-    @Before
-    public void before() {
+    @Test
+    public void lowLevelApiTest() throws Exception {
         
+        // start the test server
         class MyServlet extends HttpServlet { 
             
             @Override
@@ -56,42 +55,40 @@ public class LowLevelHttp2ClientTest {
             }
         };
         
-        server = WebServer.servlet(new MyServlet())
-                          .start();
-    }
+        WebServer server = WebServer.servlet(new MyServlet())
+                                    .start();
 
-    
-    @After
-    public void after() {
-        server.stop();
-    }
+        
 
-
-    
-    
-    @Test
-    public void lowLevelApiTest() throws Exception {
         
         // create a low-level jetty HTTP/2 client
         HTTP2Client lowLevelClient = new HTTP2Client();
         lowLevelClient.start();
         
+
+
         
         // create a new session which will open a (multiplexed) connection to the server  
         FuturePromise<Session> sessionFuture = new FuturePromise<>();
         lowLevelClient.connect(new InetSocketAddress("localhost", server.getLocalport()), new Session.Listener.Adapter(), sessionFuture);
         Session session = sessionFuture.get();
         
-        
-        
-        // send header frame 
+        // create the header frame 
         MetaData.Request metaData = new MetaData.Request("GET", HttpScheme.HTTP, new HostPortHttpField("localhost:" + server.getLocalport()), "/", HttpVersion.HTTP_2, new HttpFields());
         HeadersFrame frame = new HeadersFrame(1, metaData, null, true);
 
+        // ... and perform the http transaction
         PrintingFramesHandler framesHandler = new PrintingFramesHandler();
         session.newStream(frame, new Promise.Adapter<Stream>(), framesHandler);
 
+        
+        
+        
+        // wait until response is received (PrintingFramesHandler will write the response frame to console) 
         framesHandler.getCompletedFuture().get();
+        
+        
+        // shut down the client and server
         lowLevelClient.stop();
         server.stop();
     }
