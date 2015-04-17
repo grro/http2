@@ -63,7 +63,7 @@ public class HighLevelHttp2ClientTest {
     
     
     @Test
-    public void lowLevelApiTest() throws Exception {
+    public void highLevelApiTest() throws Exception {
         
         HTTP2Client lowLevelClient = new HTTP2Client();
         lowLevelClient.start();
