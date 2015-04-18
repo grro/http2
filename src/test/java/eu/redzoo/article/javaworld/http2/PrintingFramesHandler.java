@@ -39,7 +39,7 @@ public class PrintingFramesHandler extends Stream.Listener.Adapter {
     @Override
     public Listener onPush(Stream stream, PushPromiseFrame frame) {
         System.out.println("[" + stream.getId() + "] PUSH_PROMISE " + frame.getMetaData().toString());
-        return new PrintingFramesHandler(); 
+        return this; 
     }
     
     
