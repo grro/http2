@@ -38,14 +38,14 @@ public class PrintingFramesHandler extends Stream.Listener.Adapter {
     
     @Override
     public Listener onPush(Stream stream, PushPromiseFrame frame) {
-        System.out.println("[" + stream.getId() + "] PUSH_PROMISE " + frame.getMetaData().toString());
+        System.out.println("[" + frame.getStreamId() + "] PUSH_PROMISE " + frame.getMetaData().toString());
         return new PrintingFramesHandler(); 
     }
     
     
     @Override
     public void onHeaders(Stream stream, HeadersFrame frame) {
-        System.out.println("[" + stream.getId() + "] HEADERS " + frame.getMetaData().toString());
+        System.out.println("[" + frame.getStreamId() + "] HEADERS " + frame.getMetaData().toString());
         frame.getMetaData().getFields().forEach(field -> System.out.println("[" + stream.getId() + "]     " + field.getName() + ": " + field.getValue()));
     }
     
@@ -53,7 +53,7 @@ public class PrintingFramesHandler extends Stream.Listener.Adapter {
     public void onData(Stream stream, DataFrame frame, Callback callback) {
         byte[] bytes = new byte[frame.getData().remaining()];
         frame.getData().get(bytes);
-        System.out.println("[" + stream.getId() + "] DATA " + new String(bytes));
+        System.out.println("[" + frame.getStreamId() + "] DATA " + new String(bytes));
         callback.succeeded();
         
         if (frame.isEndStream()) {
