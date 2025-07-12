@@ -2,4 +2,6 @@
 /target
 /.classpath
 /.project
-/pom.xml
+# Java and Maven specific
+.DS_Store
+*.log

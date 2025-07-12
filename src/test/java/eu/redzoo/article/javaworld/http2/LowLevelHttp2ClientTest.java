@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HostPortHttpField;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpScheme;
+import org.eclipse.jetty.http.HttpURI;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.http.MetaData;
 import org.eclipse.jetty.http2.api.Session;
@@ -35,7 +36,7 @@ import org.eclipse.jetty.http2.client.HTTP2Client;
 import org.eclipse.jetty.http2.frames.HeadersFrame;
 import org.eclipse.jetty.util.FuturePromise;
 import org.eclipse.jetty.util.Promise;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("serial")
@@ -74,7 +75,7 @@ public class LowLevelHttp2ClientTest {
         Session session = sessionFuture.get();
         
         // create the header frame 
-        MetaData.Request metaData = new MetaData.Request("GET", HttpScheme.HTTP, new HostPortHttpField("localhost:" + server.getLocalport()), "/", HttpVersion.HTTP_2, new HttpFields());
+        MetaData.Request metaData = new MetaData.Request("GET", HttpURI.from("http://localhost:" + server.getLocalport() + "/"), HttpVersion.HTTP_2, HttpFields.build());
         HeadersFrame frame = new HeadersFrame(1, metaData, null, true);
 
         // ... and perform the http transaction
