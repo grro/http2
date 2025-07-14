@@ -26,8 +26,8 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.http2.client.HTTP2Client;
 import org.eclipse.jetty.http2.client.http.HttpClientTransportOverHTTP2;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SuppressWarnings("serial")
@@ -57,14 +57,14 @@ public class HighLevelHttp2ClientTest {
         lowLevelClient.start();
         
         // create a high-level jetty HTTP/2 client
-        HttpClient client = new HttpClient(new HttpClientTransportOverHTTP2(lowLevelClient), null);
+        HttpClient client = new HttpClient(new HttpClientTransportOverHTTP2(lowLevelClient));
         client.start();
 
 
         // and perform the http transaction
         ContentResponse response = client.GET("http://localhost:" + server.getLocalport());
         System.out.println(response.getVersion() + " " + response.getStatus() + " ");
-        Assert.assertEquals("...my body data...", new String(response.getContent()));
+        assertEquals("...my body data...", new String(response.getContent()));
 
 
         
